@@ -1,0 +1,1 @@
+export const UI_MAIN_COLOR = 'teal.300'
