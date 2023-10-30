@@ -1,5 +1,5 @@
 import {FIREBASE_AUTH, FIREBASE_GOOGLE_PROVIDER} from "../firebase.config";
-import {GoogleAuthProvider, signInWithPopup} from "firebase/auth";
+import {GoogleAuthProvider, signInWithPopup, signOut} from "firebase/auth";
 import Cookies from 'universal-cookie'
 import {Dispatch, forwardRef, SetStateAction, useImperativeHandle} from "react";
 import {Button, HStack, Text} from "@chakra-ui/react";
@@ -30,10 +30,13 @@ export const Auth = forwardRef<Ref, IAuthProps>(({currentUser, isAuth, setCurren
     const cookies = new Cookies()
 
     const handleLogout = () => {
-        cookies.remove('auth-token', {path: '/'})
-        setCurrentUser({})
-        setIsAuth(false)
-        navigate('/')
+        signOut(FIREBASE_AUTH).then(() => {
+            cookies.remove('auth-token', {path: '/'})
+            setCurrentUser({})
+            setIsAuth(false)
+            navigate('/')
+        })
+
     }
 
     const handleGoogleAuth = async () => {
@@ -47,8 +50,6 @@ export const Auth = forwardRef<Ref, IAuthProps>(({currentUser, isAuth, setCurren
             console.log('e', e)
         }
     }
-
-    console.log('isAuth in nav', isAuth)
 
     return (
         <>
