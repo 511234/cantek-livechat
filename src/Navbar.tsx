@@ -1,7 +1,7 @@
 import {Box, Divider, Flex, Heading, Spacer} from "@chakra-ui/react";
 import {UI_MAIN_COLOR} from "./constants";
 import {Auth} from "./components/Auth";
-import React, {MutableRefObject} from "react";
+import {MutableRefObject} from "react";
 import {Link} from "react-router-dom";
 
 interface INavbarProps {

@@ -1,9 +1,10 @@
-import {useParams} from "react-router-dom";
+import {Link, useParams} from "react-router-dom";
 import {addDoc, collection, onSnapshot, orderBy, query, serverTimestamp, where} from "firebase/firestore";
 import React, {useEffect, useRef, useState} from "react";
 import {FIREBASE_DB} from "../firebase.config";
-import {Avatar, Box, Heading, HStack, Input, Skeleton, Stack, Tooltip} from "@chakra-ui/react";
+import {Avatar, Box, Flex, Heading, HStack, Input, Skeleton, Stack, Tooltip} from "@chakra-ui/react";
 import {UI_MAIN_COLOR, UI_TEXT_MAIN_COLOR} from "../constants";
+import {ArrowBackIcon} from "@chakra-ui/icons";
 
 interface IRoomProps {
     currentUser: any
@@ -16,6 +17,7 @@ export const Room = ({currentUser, isAuth}: IRoomProps) => {
     const messagesRef = collection(FIREBASE_DB, "messages");
     const [isLoading, setIsLoading] = useState(true)
     const inputRef = useRef<HTMLInputElement>(null)
+
 
     const handleSubmit = async (e: any) => {
         e.preventDefault()
@@ -59,12 +61,13 @@ export const Room = ({currentUser, isAuth}: IRoomProps) => {
         return () => unsuscribe();
     }, [])
 
-    console.log('roomMessages', roomMessages)
-    console.log('currentUser', currentUser)
-    console.log('isAuth', isAuth)
-    
     return (<>
-        <Heading color={UI_MAIN_COLOR} as='h2' my='6' px="4" size='lg'>{room}</Heading>
+        <Link to={'/'}>
+            <Flex direction="row" align="center" my={3} px={4} gap={3}>
+                <ArrowBackIcon color={'white'} w="6" h="6"/>
+                <Heading color={UI_MAIN_COLOR} as='h2' size='lg'>{room}</Heading>
+            </Flex>
+        </Link>
 
         <Stack m="4" spacing='12px'>
             {isLoading && Array(6).fill(5).map((v, i) =>

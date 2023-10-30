@@ -2,7 +2,7 @@ import {FIREBASE_AUTH, FIREBASE_GOOGLE_PROVIDER} from "../firebase.config";
 import {GoogleAuthProvider, signInWithPopup} from "firebase/auth";
 import Cookies from 'universal-cookie'
 import {Dispatch, forwardRef, SetStateAction, useImperativeHandle} from "react";
-import {Button, Text} from "@chakra-ui/react";
+import {Button, HStack, Text} from "@chakra-ui/react";
 import {UI_MAIN_COLOR} from "../constants";
 import {useNavigate} from "react-router-dom";
 
@@ -61,8 +61,11 @@ export const Auth = forwardRef<Ref, IAuthProps>(({currentUser, isAuth, setCurren
                     With
                     Google</Button>}
             {isAuth &&
-                <div style={{display: 'flex', alignItems: 'center', gap: '2rem'}}>
-                    <Text color='white'>You are signed in as: {currentUser?.displayName}</Text>
+                <div style={{color: "white", display: 'flex', alignItems: 'center', gap: '2rem'}}>
+                    <HStack>
+                        <Text>You are signed in as:</Text>
+                        <Text fontWeight="bold">{currentUser?.displayName}</Text>
+                    </HStack>
                     <Button variant="unstyled" color={UI_MAIN_COLOR} onClick={handleLogout}
                             type="button">Logout</Button>
                 </div>}
