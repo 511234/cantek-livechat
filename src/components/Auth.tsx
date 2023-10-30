@@ -2,7 +2,7 @@ import {FIREBASE_AUTH, FIREBASE_GOOGLE_PROVIDER} from "../firebase.config";
 import {GoogleAuthProvider, signInWithPopup} from "firebase/auth";
 import Cookies from 'universal-cookie'
 import {Dispatch, forwardRef, SetStateAction, useImperativeHandle} from "react";
-import {Button} from "@chakra-ui/react";
+import {Button, Text} from "@chakra-ui/react";
 import {UI_MAIN_COLOR} from "../constants";
 
 type Ref = {
@@ -10,11 +10,13 @@ type Ref = {
 } | null
 
 interface IAuthProps {
+    currentUser: any
     isAuth: boolean
+    setCurrentUser: Dispatch<SetStateAction<any>>
     setIsAuth: Dispatch<SetStateAction<boolean>>
 }
 
-export const Auth = forwardRef<Ref, IAuthProps>(({isAuth, setIsAuth}, ref) => {
+export const Auth = forwardRef<Ref, IAuthProps>(({currentUser, isAuth, setCurrentUser, setIsAuth}, ref) => {
 
     useImperativeHandle(ref, () => ({
         handleAuthClick() {
@@ -26,6 +28,7 @@ export const Auth = forwardRef<Ref, IAuthProps>(({isAuth, setIsAuth}, ref) => {
 
     const handleLogout = () => {
         cookies.remove('auth-token')
+        setCurrentUser({})
         setIsAuth(false)
     }
 
@@ -49,7 +52,11 @@ export const Auth = forwardRef<Ref, IAuthProps>(({isAuth, setIsAuth}, ref) => {
                     With
                     Google</Button>}
             {isAuth &&
-                <Button variant="unstyled" color={UI_MAIN_COLOR} onClick={handleLogout} type="button">Logout</Button>}
+                <div style={{display: 'flex', alignItems: 'center', gap: '2rem'}}>
+                    <Text color='white'>You are signed in as: {currentUser?.displayName}</Text>
+                    <Button variant="unstyled" color={UI_MAIN_COLOR} onClick={handleLogout}
+                            type="button">Logout</Button>
+                </div>}
         </>
     )
 })
