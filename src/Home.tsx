@@ -1,6 +1,5 @@
-import {Center, Flex, Grid, Heading, Spinner, useDisclosure} from "@chakra-ui/react";
+import {Button, Center, Flex, Grid, Heading, Spinner, useDisclosure} from "@chakra-ui/react";
 import {UI_MAIN_COLOR} from "./constants";
-import {RoomDoor} from "./components/RoomDoor";
 import React, {MutableRefObject, useEffect, useMemo, useRef, useState} from "react";
 import {collection, onSnapshot, query} from "firebase/firestore";
 import {FIREBASE_DB} from "./firebase.config";
@@ -77,9 +76,11 @@ export const Home = ({buttonRef, currentUser, isAuth, setCurrentUser}: IHomeProp
             {!isLoading &&
                 <Grid templateColumns='1fr' gap={6} px={4}>
                     {rooms.map((val) =>
-                        <Link key={val} to={`/rooms/${val}`}>
-                            <RoomDoor key={val} text={val}/>
-                        </Link>
+                        <Center>
+                            <Button key={val} as={Link} to={`/rooms/${val}`} colorScheme='teal' w={'50%'}>
+                                {val}
+                            </Button>
+                        </Center>
                     )}
                 </Grid>
             }

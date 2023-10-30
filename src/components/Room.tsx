@@ -71,7 +71,7 @@ export const Room = ({currentUser, isAuth}: IRoomProps) => {
 
         <Stack m="4" spacing='12px'>
             {isLoading && Array(6).fill(5).map((v, i) =>
-                <Skeleton key={i} height={`${80 - v * i}px`}/>
+                <Skeleton startColor='teal.100' endColor='teal.900' key={i} height={`${80 - v * i}px`}/>
             )}
 
             {!isLoading &&
