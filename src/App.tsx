@@ -11,7 +11,7 @@ import {FIREBASE_AUTH} from "./firebase.config";
 function App() {
     const cookies = new Cookies()
     const [currentUser, setCurrentUser] = useState<any>()
-    const [isAuth, setIsAuth] = useState(!!cookies.get('auth-token'))
+    const [isAuth, setIsAuth] = useState(() => !!cookies.get('auth-token'))
 
     const buttonRef = useRef<any>(null)
 
@@ -22,20 +22,24 @@ function App() {
                 const displayName = user?.displayName || '';
                 const uid = user.uid
                 setCurrentUser({displayName, uid})
+                cookies.set('auth-token', user.refreshToken)
+                setIsAuth(true)
             } else {
                 setCurrentUser({})
+                setIsAuth(false)
             }
         });
     }, [])
 
     return (
         <>
-            <Navbar buttonRef={buttonRef} currentUser={currentUser} setCurrentUser={setCurrentUser}/>
+            <Navbar buttonRef={buttonRef} currentUser={currentUser} setCurrentUser={setCurrentUser} isAuth={isAuth}
+                    setIsAuth={setIsAuth}/>
             <Routes>
                 <Route path="/" element={<Home buttonRef={buttonRef} currentUser={currentUser} isAuth={isAuth}
                                                setCurrentUser={setCurrentUser}/>}
                 />
-                <Route path="/rooms/:name" element={<Room currentUser={currentUser}/>}/>
+                <Route path="/rooms/:room" element={<Room isAuth={isAuth} currentUser={currentUser}/>}/>
             </Routes>
         </>
 

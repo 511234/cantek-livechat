@@ -1,8 +1,7 @@
 import {Center, Flex, Grid, Heading, Spinner} from "@chakra-ui/react";
 import {UI_MAIN_COLOR} from "./constants";
 import {RoomDoor} from "./components/RoomDoor";
-import React, {MutableRefObject, useEffect, useState} from "react";
-import Cookies from "universal-cookie";
+import React, {MutableRefObject, useEffect, useMemo, useState} from "react";
 import {collection, onSnapshot, orderBy, query} from "firebase/firestore";
 import {FIREBASE_DB} from "./firebase.config";
 import {Link} from "react-router-dom";
@@ -16,7 +15,9 @@ interface IHomeProps {
 
 export const Home = ({buttonRef, currentUser, isAuth, setCurrentUser}: IHomeProps) => {
 
-    const cookies = new Cookies()
+    const handleModalOpen = () => {
+        setIsModalOpen(true)
+    }
 
     const [isLoading, setIsLoading] = useState(true)
     const [isModalOpen, setIsModalOpen] = useState(false)
@@ -24,22 +25,14 @@ export const Home = ({buttonRef, currentUser, isAuth, setCurrentUser}: IHomeProp
     const [rooms, setRooms] = useState<string[]>([])
     const messagesRef = collection(FIREBASE_DB, "messages");
 
-
-    const handleModalOpen = () => {
-        setIsModalOpen(true)
-    }
-
     const handleTextClick = () => {
         buttonRef?.current?.handleAuthClick()
     }
 
-    const ACTION_MESSAGE = isAuth ? "Create" : "Sign In"
-    const ACTION_FUNCTION = isAuth ? handleModalOpen : handleTextClick
+    const actionMessage = useMemo(() => isAuth ? "Create" : "Sign In", [isAuth])
+    const actionFunction = useMemo(() => isAuth ? handleModalOpen : handleTextClick, [isAuth])
 
     useEffect(() => {
-
-
-        console.log('currentUser', currentUser)
 
         const queryMessages = query(
             messagesRef,
@@ -53,7 +46,6 @@ export const Home = ({buttonRef, currentUser, isAuth, setCurrentUser}: IHomeProp
                 rms.add(doc.data().room)
                 msgs.push({...doc.data(), id: doc.id});
             });
-            console.log('rms', rms)
             const strArrRooms = Array.from(rms) as string[]
             setRooms(strArrRooms)
             setMessages(messages);
@@ -70,7 +62,7 @@ export const Home = ({buttonRef, currentUser, isAuth, setCurrentUser}: IHomeProp
 
             <Heading color={UI_MAIN_COLOR} as='span' py='6' px="2" size='md'>Have a topic in mind?</Heading>
             <Heading color='white' as='button' py='6' px="1" size='md'
-                     onClick={ACTION_FUNCTION}>{ACTION_MESSAGE}</Heading>
+                     onClick={actionFunction}>{actionMessage}</Heading>
             <Heading color={UI_MAIN_COLOR} as='span' py='6' px="2" size='md'>to start a conversation!</Heading>
 
             {isLoading &&
@@ -83,7 +75,7 @@ export const Home = ({buttonRef, currentUser, isAuth, setCurrentUser}: IHomeProp
             {!isLoading &&
                 <Grid templateColumns='1fr' gap={6} px={4}>
                     {rooms.map((val) =>
-                        <Link to={`/rooms/${val}`}>
+                        <Link key={val} to={`/rooms/${val}`}>
                             <RoomDoor key={val} text={val}/>
                         </Link>
                     )}

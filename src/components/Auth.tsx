@@ -4,6 +4,7 @@ import Cookies from 'universal-cookie'
 import {Dispatch, forwardRef, SetStateAction, useImperativeHandle} from "react";
 import {Button, Text} from "@chakra-ui/react";
 import {UI_MAIN_COLOR} from "../constants";
+import {useNavigate} from "react-router-dom";
 
 type Ref = {
     handleAuthClick: () => void
@@ -18,6 +19,8 @@ interface IAuthProps {
 
 export const Auth = forwardRef<Ref, IAuthProps>(({currentUser, isAuth, setCurrentUser, setIsAuth}, ref) => {
 
+    const navigate = useNavigate()
+
     useImperativeHandle(ref, () => ({
         handleAuthClick() {
             handleGoogleAuth()
@@ -27,9 +30,10 @@ export const Auth = forwardRef<Ref, IAuthProps>(({currentUser, isAuth, setCurren
     const cookies = new Cookies()
 
     const handleLogout = () => {
-        cookies.remove('auth-token')
+        cookies.remove('auth-token', {path: '/'})
         setCurrentUser({})
         setIsAuth(false)
+        navigate('/')
     }
 
     const handleGoogleAuth = async () => {
@@ -45,10 +49,15 @@ export const Auth = forwardRef<Ref, IAuthProps>(({currentUser, isAuth, setCurren
         }
     }
 
+    console.log('isAuth in nav', isAuth)
+
     return (
         <>
             {!isAuth &&
-                <Button variant="unstyled" color={UI_MAIN_COLOR} onClick={handleGoogleAuth} type="button">Sign In / Up
+                <Button style={{
+                    whiteSpace: "normal",
+                    wordWrap: "break-word",
+                }} variant="unstyled" color={UI_MAIN_COLOR} onClick={handleGoogleAuth} type="button">Sign In / Up
                     With
                     Google</Button>}
             {isAuth &&

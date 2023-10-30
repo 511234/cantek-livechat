@@ -1,26 +1,49 @@
 import {useParams} from "react-router-dom";
-import {collection, onSnapshot, orderBy, query, where} from "firebase/firestore";
-import {useEffect, useState} from "react";
+import {addDoc, collection, onSnapshot, orderBy, query, serverTimestamp, where} from "firebase/firestore";
+import React, {useEffect, useRef, useState} from "react";
 import {FIREBASE_DB} from "../firebase.config";
-import {Avatar, Box, HStack, Input, Skeleton, Stack, Tooltip} from "@chakra-ui/react";
+import {Avatar, Box, Heading, HStack, Input, Skeleton, Stack, Tooltip} from "@chakra-ui/react";
 import {UI_MAIN_COLOR, UI_TEXT_MAIN_COLOR} from "../constants";
 
+interface IRoomProps {
+    currentUser: any
+    isAuth: boolean
+}
 
-export const Room = ({currentUser}: { currentUser: any }) => {
-    const {name} = useParams()
+export const Room = ({currentUser, isAuth}: IRoomProps) => {
+    const {room} = useParams()
     const [roomMessages, setRoomMessages] = useState<any[]>([])
     const messagesRef = collection(FIREBASE_DB, "messages");
     const [isLoading, setIsLoading] = useState(true)
+    const inputRef = useRef<HTMLInputElement>(null)
 
-    const handleSubmit = () => {
+    const handleSubmit = async (e: any) => {
+        e.preventDefault()
+        try {
 
+            if (!inputRef?.current?.value) {
+                return
+            }
+
+            await addDoc(messagesRef, {
+                text: inputRef.current.value,
+                createdAt: serverTimestamp(),
+                displayName: currentUser.displayName,
+                uid: currentUser.uid,
+                room,
+            });
+
+            inputRef.current.value = ''
+
+        } catch (e) {
+            console.log('e', e)
+        }
     }
 
     useEffect(() => {
-
         const queryMessages = query(
             messagesRef,
-            where("room", "==", name)
+            where("room", "==", room)
             , orderBy("createdAt")
         );
 
@@ -38,13 +61,14 @@ export const Room = ({currentUser}: { currentUser: any }) => {
 
     console.log('roomMessages', roomMessages)
     console.log('currentUser', currentUser)
-
-
+    console.log('isAuth', isAuth)
+    
     return (<>
-        {name}
+        <Heading color={UI_MAIN_COLOR} as='h2' my='6' px="4" size='lg'>{room}</Heading>
+
         <Stack m="4" spacing='12px'>
             {isLoading && Array(6).fill(5).map((v, i) =>
-                <Skeleton height={`${80 - v * i}px`}/>
+                <Skeleton key={i} height={`${80 - v * i}px`}/>
             )}
 
             {!isLoading &&
@@ -56,11 +80,12 @@ export const Room = ({currentUser}: { currentUser: any }) => {
                         {roomMessages.map(msg => {
                                 const isCurrentUser = currentUser?.uid === msg.uid
                                 return (
-                                    <HStack direction='row' gap={5}>
+                                    <HStack key={msg.text} justify={isCurrentUser ? 'end' : 'start'} direction='row'
+                                            gap={5}>
                                         <Tooltip label={msg.displayName} fontSize='md'>
                                             <Avatar name={msg.displayName}/>
                                         </Tooltip>
-                                        <Box bgColor={isCurrentUser ? UI_MAIN_COLOR : 'white'}
+                                        <Box bgColor={isCurrentUser ? UI_TEXT_MAIN_COLOR : 'white'}
                                              borderRadius="lg"
                                              fontWeight="semibold"
                                              h='100%' w='30%'
@@ -81,14 +106,20 @@ export const Room = ({currentUser}: { currentUser: any }) => {
                              mt={4}
                              w='100%'
                         >
-                            <form onSubmit={handleSubmit}>
-                                <Input
-                                    autoFocus
-                                    mx={4}
-                                    placeholder='Enter your message'
-                                    _placeholder={{opacity: 0.8, color: 'white'}}
-                                    variant="unstyled"
-                                /></form>
+                            {isAuth &&
+                                <form onSubmit={handleSubmit}>
+                                    <Input
+                                        autoFocus
+                                        mx={4}
+                                        placeholder='Enter your message'
+                                        _placeholder={{opacity: 0.8, color: 'white'}}
+                                        ref={inputRef}
+                                        variant="unstyled"
+                                    /></form>
+                            }
+                            {!isAuth &&
+                                <span>Please Login</span>
+                            }
                         </Box>
 
                     </Box>
