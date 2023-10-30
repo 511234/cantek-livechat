@@ -41,7 +41,6 @@ export const Auth = forwardRef<Ref, IAuthProps>(({currentUser, isAuth, setCurren
             const result = await signInWithPopup(FIREBASE_AUTH, FIREBASE_GOOGLE_PROVIDER)
             const credential = GoogleAuthProvider.credentialFromResult(result);
             const token = credential?.accessToken;
-            const user = result.user;
             cookies.set('auth-token', result.user.refreshToken)
             setIsAuth(true)
         } catch (e) {
