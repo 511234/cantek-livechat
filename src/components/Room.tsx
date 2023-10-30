@@ -2,7 +2,7 @@ import {Link, useParams} from "react-router-dom";
 import {addDoc, collection, onSnapshot, orderBy, query, serverTimestamp, where} from "firebase/firestore";
 import React, {useEffect, useRef, useState} from "react";
 import {FIREBASE_DB} from "../firebase.config";
-import {Avatar, Box, Flex, Heading, HStack, Input, Skeleton, Stack, Tooltip} from "@chakra-ui/react";
+import {Avatar, Box, Flex, Heading, HStack, Input, Skeleton, Stack, Text, Tooltip} from "@chakra-ui/react";
 import {UI_MAIN_COLOR, UI_TEXT_MAIN_COLOR} from "../constants";
 import {ArrowBackIcon} from "@chakra-ui/icons";
 
@@ -84,7 +84,7 @@ export const Room = ({currentUser, isAuth}: IRoomProps) => {
                                 const isCurrentUser = currentUser?.uid === msg.uid
                                 return (
                                     <HStack key={msg.text} justify={isCurrentUser ? 'end' : 'start'} direction='row'
-                                            gap={5}>
+                                            gap={5} my={4}>
                                         <Tooltip label={msg.displayName} fontSize='md'>
                                             <Avatar name={msg.displayName}/>
                                         </Tooltip>
@@ -121,7 +121,7 @@ export const Room = ({currentUser, isAuth}: IRoomProps) => {
                                     /></form>
                             }
                             {!isAuth &&
-                                <span>Please Login</span>
+                                <Text mx={4}>Please Login</Text>
                             }
                         </Box>
 
